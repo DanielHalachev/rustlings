@@ -26,8 +26,50 @@ enum Command {
 mod my_module {
     use super::Command;
 
+    // fn append_n_times(input: &str, times: &usize) -> String {
+    //     const WORD: &str = "bar";
+
+    //     let mut appended = String::new();
+    //     for _ in 0..*times {
+    //         appended.push_str(WORD);
+    //     }
+
+    //     input.to_string() + &appended
+    // }
+
     // TODO: Complete the function as described above.
-    // pub fn transformer(input: ???) -> ??? { ??? }
+    // NOTE: I would personally ask for a reference, but the tests expect consuming the Vec
+    // however, transformations usually consume the parameter and here it's beneficial
+
+    // pub fn transformer(input: &[(String, Command)] -> Vec<String> {
+    //     let output = input.iter().map(|(string, command)| -> String {
+    //         match command {
+    //             Command::Uppercase => return string.to_uppercase(),
+    //             Command::Trim => return string.trim().to_string(),
+    //             Command::Append(times) => return append_n_times(string, times),
+    //         }
+    //     });
+
+    //     // NOTE: we don't even need to create a variable `output` to return it cleanly
+    //     // but I think it's more readable
+    //     output.collect()
+    // }
+
+    // NOTE: the difference between iter() and into_iter() is that iter() creates a reference to the element
+    // while into_iter() directly consumes the element
+    pub fn transformer(input: Vec<(String, Command)>) -> Vec<String> {
+        let output = input.into_iter().map(|(string, command)| -> String {
+            match command {
+                Command::Uppercase => return string.to_uppercase(),
+                Command::Trim => return string.trim().to_string(),
+                Command::Append(times) => string + &"bar".repeat(times), // this directly consumes the string and avoids copies
+            }
+        });
+
+        // NOTE: we don't even need to create a variable `output` to return it cleanly
+        // but I think it's more readable
+        output.collect()
+    }
 }
 
 fn main() {
@@ -36,9 +78,10 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+
     // TODO: What do we need to import to have `transformer` in scope?
-    // use ???;
     use super::Command;
+    use crate::my_module::transformer;
 
     #[test]
     fn it_works() {

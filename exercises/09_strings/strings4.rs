@@ -13,25 +13,40 @@ fn string(arg: String) {
 // Your task is to replace `placeholder(…)` with either `string_slice(…)`
 // or `string(…)` depending on what you think each value is.
 fn main() {
-    placeholder("blue");
+    string_slice("blue");
 
-    placeholder("red".to_string());
+    string("red".to_string());
 
-    placeholder(String::from("hi"));
+    string(String::from("hi"));
 
-    placeholder("rust is fun!".to_owned());
+    // if you own something, it's not a reference
+    // thus not &str
+    // thus only a String can be owned
+    string("rust is fun!".to_owned());
 
-    placeholder("nice weather".into());
+    string_slice("nice weather".into());
 
-    placeholder(format!("Interpolation {}", "Station"));
+    // format appends/composes strings, so String makes sense to be the return value
+    // after all, the new byte array for the string needs to be allocated and &str cannot do that
+    string(format!("Interpolation {}", "Station"));
 
     // WARNING: This is byte indexing, not character indexing.
     // Character indexing can be done using `s.chars().nth(INDEX)`.
-    placeholder(&String::from("abc")[0..1]);
+    // we are taking a slice of String here, which is &str
+    string_slice(&String::from("abc")[0..1]);
 
-    placeholder("  hello there ".trim());
+    // trimming returns a substring of the String/&str, thus we can return &str here
+    string_slice("  hello there ".trim());
 
-    placeholder("Happy Monday!".replace("Mon", "Tues"));
+    // replacement may increase the length of the &str/String
+    // so a new allocation may be necessary
+    // &str cannot do that => String
+    string("Happy Monday!".replace("Mon", "Tues"));
 
-    placeholder("mY sHiFt KeY iS sTiCkY".to_lowercase());
+    // to convert to lowercase, we need a &mut str
+    // &str cannot do that
+    string("mY sHiFt KeY iS sTiCkY".to_lowercase());
+
+    // TL;DR: slices are immutable, thus they can only be used as return types
+    // for operations that return an unmodified segment of a string
 }
