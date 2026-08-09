@@ -6,5 +6,7 @@ macro_rules! my_macro {
 
 fn main() {
     // TODO: Fix the macro call.
-    my_macro();
+    // my_macro();
+    // all macros have ! at the end of their names
+    my_macro!();
 }

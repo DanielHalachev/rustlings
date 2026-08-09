@@ -25,7 +25,11 @@ mod tests {
 
     #[test]
     fn reference_mutation() {
-        // Clone occurs because `input` needs to be mutated.
+        // in order to modify the data, you need to own it
+        // here Cow is constructed from an immutable reference
+        // mutation is required, so Cow creates a copy that is mutated
+        // and Cow owns that copy, the borrowed one remains unchanged
+
         let vec = vec![-1, 0, 1];
         let mut input = Cow::from(&vec);
         abs_all(&mut input);
@@ -34,12 +38,14 @@ mod tests {
 
     #[test]
     fn reference_no_mutation() {
-        // No clone occurs because `input` doesn't need to be mutated.
+        // The input won't change
+        // so no mutation is necessary, and no clone is necessary
+        // Cow points to the original, borrowed data
         let vec = vec![0, 1, 2];
         let mut input = Cow::from(&vec);
         abs_all(&mut input);
         // TODO: Replace `todo!()` with `Cow::Owned(_)` or `Cow::Borrowed(_)`.
-        assert!(matches!(input, todo!()));
+        assert!(matches!(input, Cow::Borrowed(_)));
     }
 
     #[test]
@@ -52,7 +58,7 @@ mod tests {
         let mut input = Cow::from(vec);
         abs_all(&mut input);
         // TODO: Replace `todo!()` with `Cow::Owned(_)` or `Cow::Borrowed(_)`.
-        assert!(matches!(input, todo!()));
+        assert!(matches!(input, Cow::Owned(_)));
     }
 
     #[test]
@@ -64,6 +70,6 @@ mod tests {
         let mut input = Cow::from(vec);
         abs_all(&mut input);
         // TODO: Replace `todo!()` with `Cow::Owned(_)` or `Cow::Borrowed(_)`.
-        assert!(matches!(input, todo!()));
+        assert!(matches!(input, Cow::Owned(_)));
     }
 }

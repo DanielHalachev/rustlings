@@ -3,6 +3,28 @@
 // wait until all the spawned threads have finished and should collect their
 // return values into a vector.
 
+// std::thread::spawn = std::thread t (lambda) or std::async(std::launch::async, lambda) in C++.
+// when an std::thread in C++ is joined, void () is returned
+// for an actual result in C++, you need std::async + std::future
+// In Rust, std::thread::spawn returns a handler that always returns a result
+// In Rust, you call join() on the handler, in C++ you call t.join() on the thread object itself or fut.get() on the future
+// In C++, you capture by value [i]{...}, in Rust the lambda takes ownership of the inputs, instead of borrowing them (move)
+// this is because the thread may outlive main's stack frame
+
+// std::vector<std::future<long long>> handles;
+// for (int i = 0; i < 10; ++i) {
+//     handles.push_back(std::async(std::launch::async, [i] {
+//         auto start = std::chrono::steady_clock::now();
+//         std::this_thread::sleep_for(std::chrono::milliseconds(250));
+//         std::println("Thread {} done", i);
+//         return std::chrono::duration_cast<std::chrono::milliseconds>(
+//                    std::chrono::steady_clock::now() - start).count();
+//     }));
+// }
+
+// std::vector<long long> results;
+// for (auto& handle : handles) results.push_back(handle.get());
+
 use std::{
     thread,
     time::{Duration, Instant},
@@ -24,6 +46,8 @@ fn main() {
     for handle in handles {
         // TODO: Collect the results of all threads into the `results` vector.
         // Use the `JoinHandle` struct which is returned by `thread::spawn`.
+        let result = handle.join();
+        results.push(result.unwrap());
     }
 
     if results.len() != 10 {

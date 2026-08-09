@@ -16,6 +16,17 @@
 // that later in the exercises about threads.
 
 // Don't change the lines below.
+
+// NOTE: Arc<T> is the C++ std::shared_ptr<T>. Unlike Rc, Arc is thread-safe.
+// Both Arc and std::shared_ptr have atomic reference count, but neither synchronizes access to the data itself.
+// libstdc++ optimizes away the atomic count update when the program is single-threaded, libc++ does not do it.
+// Rust makes the thread-safe choice explicit instead, which is why both Rc and Arc exist.
+
+// To synchronize access to the data:
+//   Arc<Mutex<T>>   / shared_ptr + std::mutex        -- only one thread has access, regardless if reading or writing
+//   Arc<RwLock<T>>  / shared_ptr + std::shared_mutex -- many readers or one writer access the data
+//   Arc<T>          / shared_ptr, no lock            -- enough when all threads read only (race condition is impossible)
+
 #![forbid(unused_imports)]
 use std::{sync::Arc, thread};
 
@@ -24,12 +35,14 @@ fn main() {
 
     // TODO: Define `shared_numbers` by using `Arc`.
     // let shared_numbers = ???;
+    let shared_numbers = Arc::new(numbers);
 
     let mut join_handles = Vec::new();
 
     for offset in 0..8 {
         // TODO: Define `child_numbers` using `shared_numbers`.
         // let child_numbers = ???;
+        let child_numbers = Arc::clone(&shared_numbers);
 
         let handle = thread::spawn(move || {
             let sum: u32 = child_numbers.iter().filter(|&&n| n % 8 == offset).sum();
