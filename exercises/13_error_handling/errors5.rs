@@ -48,7 +48,13 @@ impl PositiveNonzeroInteger {
 
 // TODO: Add the correct return type `Result<(), Box<dyn ???>>`. What can we
 // use to describe both errors? Is there a trait which both errors implement?
-fn main() {
+// Solution: make main return a result that may be an error
+// Since Error is a trait, and the result is something that implements that trait
+// we mark that something as Box<Error>
+// and since error is a trait, that's why we need Box<din Error>
+// din is a prefix of a trait object's type
+// calls to methods on the associated trait are dynamically dispatched
+fn main() -> Result<(), Box<dyn Error>> {
     let pretend_user_input = "42";
     let x: i64 = pretend_user_input.parse()?;
     println!("output={:?}", PositiveNonzeroInteger::new(x)?);

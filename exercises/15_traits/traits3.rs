@@ -3,7 +3,41 @@ trait Licensed {
     // implementors like the two structs below can share that default behavior
     // without repeating the function.
     // The default license information should be the string "Default license".
-    fn licensing_info(&self) -> String;
+    // NOTE: the default implementation sits here, not in a separate impl block
+    fn licensing_info(&self) -> String {
+        String::from("Default license")
+    }
+}
+
+// NOTE: this is wrong!
+// This is not a default implementation, but an "inherent implementation"
+// `dyn Licensed`` is a dynamically sized, type-erased view of some value implementing Licensed
+// so it must normally be accessed through &dyn Licensed, Box<dyn Licensed>, and similar pointers.
+impl dyn Licensed {
+    // this method:
+    // is available only through a trait object
+    // is not part of the trait's virtual functions table
+    // thus:
+    // is not inherited by SomeSoftware
+    // cannot be overridden by individual Licensed implementations
+    // can call actual trait methods which then dynamically dispatch through the vtable
+    // would throw an error if named exactly as the trait method and called on dyn Licensed
+    fn licensing_info2(&self) -> String {
+        String::from("Default license")
+    }
+    // an operation available for all objects that implement Licensed should be a default
+    // this definition above is only useful to define behavior on trait objects (usually type-erased)
+    // rather than on the concrete underlying types
+    // effectively static vs dynamic dispatch behavior
+    // a rare use case is a factory returning a trait object, e.g.
+    // impl dyn Service {
+    //     fn from_name(name: &str) -> Box<dyn Service> {
+    //         Select a concrete implementation at runtime.
+    //         ...
+    //     }
+    // }
+
+    // let service = <dyn Service>::from_name("email");
 }
 
 struct SomeSoftware {
